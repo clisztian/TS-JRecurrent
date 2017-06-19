@@ -138,6 +138,8 @@ public class Trainer {
 		int correctScore = 0;
 		int total = 0;
 		for (DataSequence seq : sequences) {
+			
+			System.out.println(seq.toString());
 			model.resetState();
 			Graph g = new Graph(applyTraining);
 			for (DataStep step : seq.steps) {
@@ -145,6 +147,8 @@ public class Trainer {
 				if (step.targetOutput != null) {
 					
 					double loss = lossReporting.measure(output, step.targetOutput);
+//					System.out.println(step.input.toString());
+//					System.out.println("==== Output " + output.toString());
 					
 					total++;
 					if(maxindx(output.w) == maxindx(step.targetOutput.w)) {
