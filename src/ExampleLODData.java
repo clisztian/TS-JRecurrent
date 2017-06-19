@@ -18,7 +18,7 @@ public class ExampleLODData {
 		int number_sequences = 500;
 		int number_sensors = 8;
 		
-		DataSet data = new LODdata(number_sensors, number_sequences);
+		DataSet data = new LODdata(number_sensors, number_sequences, "");
 		int hiddenDimension = 20;
 		int hiddenLayers = 2;
 		double learningRate = 0.004;
@@ -33,7 +33,9 @@ public class ExampleLODData {
 		int reportEveryNthEpoch = 10;
 		int trainingEpochs = 1000;
 		
-		Trainer.train(trainingEpochs, learningRate, nn, data, reportEveryNthEpoch, rng);
+		String modelLoc = "/home/lisztian/TS-JRecurrent/saved_models/LODmodel.ser";
+		
+		Trainer.train(trainingEpochs, learningRate, nn, data, reportEveryNthEpoch, rng, modelLoc);
 		
 		System.out.println("done.");
 	}

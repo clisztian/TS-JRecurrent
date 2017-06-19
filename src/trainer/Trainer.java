@@ -23,6 +23,10 @@ public class Trainer {
 		return train(trainingEpochs, learningRate, model, data, reportEveryNthEpoch, false, false, null, rng);
 	}
 	
+	public static double train(int trainingEpochs, double learningRate, Model model, DataSet data, int reportEveryNthEpoch, Random rng, String savePath) throws Exception {
+		return train(trainingEpochs, learningRate, model, data, reportEveryNthEpoch, false, true, savePath, rng);
+	}
+	
 	public static double train(int trainingEpochs, double learningRate, Model model, DataSet data, int reportEveryNthEpoch, boolean initFromSaved, boolean overwriteSaved, String savePath, Random rng) throws Exception {
 		System.out.println("--------------------------------------------------------------");
 		
@@ -62,6 +66,10 @@ public class Trainer {
 			if (data.validation != null && epoch%reportEveryNthEpoch == reportEveryNthEpoch - 1 ) {
 				reportedLossValidation = passScore(learningRate, model, data.validation, false, data.lossTraining, data.lossReporting);
 				result = reportedLossValidation;
+				if (overwriteSaved) {
+				  FileIO.serialize(savePath, model);
+				  System.out.println("Saving model to " + savePath);
+				}
 			}
 			if (data.testing != null) {
 				reportedLossTesting = pass(learningRate, model, data.testing, false, data.lossTraining, data.lossReporting);
@@ -69,6 +77,7 @@ public class Trainer {
 			}
 			if (data.unit != null && epoch%reportEveryNthEpoch == reportEveryNthEpoch - 1 ) {
 				passEval(learningRate, model, data.validation, false, data.lossTraining, data.lossReporting);
+				
 			}
 			
 			show += "\ttrain loss = "+String.format("%.5f", reportedLossTrain);
@@ -84,9 +93,9 @@ public class Trainer {
 				data.DisplayReport(model, rng);
 			}
 			
-			if (overwriteSaved) {
-				FileIO.serialize(savePath, model);
-			}
+//			if (overwriteSaved) {
+//				FileIO.serialize(savePath, model);
+//			}
 			
 			if (reportedLossTrain == 0 && reportedLossValidation == 0) {
 				System.out.println("--------------------------------------------------------------");

@@ -28,7 +28,7 @@ public class LODdata extends DataSet {
 	 */
 	private static final long serialVersionUID = 1L;
 
-	public LODdata(int number_sensors, int number_sequences) throws IOException {
+	public LODdata(int number_sensors, int number_sequences, String root) throws IOException {
 		
 		inputDimension = number_sensors;
 		outputDimension = 2;
@@ -36,16 +36,16 @@ public class LODdata extends DataSet {
 		lossTraining = new LossSoftmax();
 		lossReporting = new LossSoftmax();
 		
-		String train = "data/car_driverdoor.csv";
+		String train = root + "data/car_driverdoor.csv";
 		//buildLODdata(number_sequences, 0, train);
 		//training = readChunkOfData(new File(train), inputDimension);
 		training = readChunkOfCarData(new File(train), inputDimension);
 		
-		String valid = "data/car_passbydriverside.csv";
+		String valid = root + "data/car_passbydriverside.csv";
 		//buildLODdata(number_sequences, 563, valid);		
 		validation = readChunkOfCarData(new File(valid), inputDimension);
 		
-		String test = "data/car_idle.csv";
+		String test = root + "data/car_idle.csv";
 		//buildLODdata(number_sequences, 123, test);
 		testing = readChunkOfCarData(new File(valid), inputDimension);
 		
@@ -126,7 +126,7 @@ public class LODdata extends DataSet {
 		return result; 
 	}
 	
-	public List<DataSequence> readChunkOfCarData(File file, int number_of_sensors) throws IOException {
+	public static List<DataSequence> readChunkOfCarData(File file, int number_of_sensors) throws IOException {
 		
 		String delims = "[;]+";
 		String[] tokens; 
@@ -159,15 +159,6 @@ public class LODdata extends DataSet {
             	
         		double[][] sensorMatrix = sensorCollection.stream().map(  u  ->  u.stream().mapToDouble(i->i).toArray()  ).toArray(double[][]::new);
         		DataSequence sequence = new DataSequence();
-//        		
-//        		System.out.println(sensorMatrix[0][tokens.length-3] + " " + 
-//        				sensorMatrix[1][tokens.length-3] + " " + 
-//        				sensorMatrix[2][tokens.length-3] + " " +
-//        				sensorMatrix[3][tokens.length-3] + " " +
-//        				sensorMatrix[4][tokens.length-3] + " " +
-//        				sensorMatrix[5][tokens.length-3] + " " +
-//        				sensorMatrix[6][tokens.length-3] + " " +
-//        				sensorMatrix[7][tokens.length-3]);
         		
         		for(int j = 2; j < tokens.length; j++) {
         			
