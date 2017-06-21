@@ -36,16 +36,16 @@ public class LODdata extends DataSet {
 		lossTraining = new LossSoftmax();
 		lossReporting = new LossSoftmax();
 		
-		String train = root + "data/car_driverdoor.csv";
+		String train = root + "data/lod_data_first.csv";
 		//buildLODdata(number_sequences, 0, train);
 		//training = readChunkOfData(new File(train), inputDimension);
 		training = readChunkOfCarData(new File(train), inputDimension);
 		
-		String valid = root + "data/car_passbydriverside.csv";
+		String valid = root + "data/lod_data_val.csv";
 		//buildLODdata(number_sequences, 563, valid);		
 		validation = readChunkOfCarData(new File(valid), inputDimension);
 		
-		String test = root + "data/car_idle.csv";
+		String test = root + "data/lod_data_last.csv";
 		//buildLODdata(number_sequences, 123, test);
 		testing = readChunkOfCarData(new File(valid), inputDimension);
 		
@@ -152,26 +152,23 @@ public class LODdata extends DataSet {
         	sensorCollection.add(sensor_read);
         	sensor_count++;
         	
-            if(sensor_count == number_of_sensors-1) {
+            if(sensor_count == number_of_sensors) {
             	
-            	//add one more to make 8
-            	sensorCollection.add(sensor_read);
             	
         		double[][] sensorMatrix = sensorCollection.stream().map(  u  ->  u.stream().mapToDouble(i->i).toArray()  ).toArray(double[][]::new);
         		DataSequence sequence = new DataSequence();
         		
-        		for(int j = 2; j < tokens.length; j++) {
-        			
-        			DataStep step = new DataStep();
+        		for(int j = 2; j < tokens.length-1; j++) {
+        			     			
         			double[] input = new double[number_of_sensors];
-        			
         			for(int i = 0; i < number_of_sensors; i++) {
         				input[i] = sensorMatrix[i][j-2];
         			}
-        			step.input = new Matrix(input);
+
+        			DataStep step = new DataStep(input, null);
         			
         			//if at end of sequence, add a target state
-        			if(j == tokens.length-1) {
+        			if(j == tokens.length-2) {
         				
         				double[] targetOutput = new double[2];
                 		targetOutput[0] = 1.0; targetOutput[1] = 0.0;
@@ -179,7 +176,6 @@ public class LODdata extends DataSet {
                 		if(sensorMatrix[0][sensorMatrix[0].length-1] != 0) {
                 			targetOutput[0] = 0.0; targetOutput[1] = 1.0;              			
                 		}
-                		//System.out.println(targetOutput[0] + " " + targetOutput[1]);
                 		step.targetOutput = new Matrix(targetOutput);
         			}
         			sequence.steps.add(step);
