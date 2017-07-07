@@ -36,7 +36,7 @@ public class LODdata extends DataSet {
 		lossTraining = new LossSoftmax();
 		lossReporting = new LossSoftmax();
 		
-		String train = root + "data/lod_data_first.csv";
+		String train = root + "data/lod_data_train.csv";
 		//buildLODdata(number_sequences, 0, train);
 		//training = readChunkOfData(new File(train), inputDimension);
 		training = readChunkOfCarData(new File(train), inputDimension);
@@ -45,7 +45,7 @@ public class LODdata extends DataSet {
 		//buildLODdata(number_sequences, 563, valid);		
 		validation = readChunkOfCarData(new File(valid), inputDimension);
 		
-		String test = root + "data/lod_data_last.csv";
+		String test = root + "data/lod_data_test.csv";
 		//buildLODdata(number_sequences, 123, test);
 		testing = readChunkOfCarData(new File(valid), inputDimension);
 		
@@ -190,6 +190,74 @@ public class LODdata extends DataSet {
 		return result; 
 	}	
 	
+    public static List<DataSequence> readChunkOfUSIR(File file, int number_of_sensors) throws IOException {
+		
+		String delims = "[;]+";
+		String[] tokens; 
+		String strline; 
+		List<DataSequence> result = new ArrayList<>();
+		ArrayList<ArrayList<Double>> sensorCollection = new ArrayList<ArrayList<Double>>();
+		
+		int sensor_count = 0; 
+		
+		FileInputStream fin; DataInputStream din; BufferedReader br;
+		fin = new FileInputStream(file);
+        din = new DataInputStream(fin);
+        br = new BufferedReader(new InputStreamReader(din));
+		
+        while((strline = br.readLine()) != null) {
+        	
+        	tokens = strline.split(delims);
+        	
+        	ArrayList<Double> sensor_read = new ArrayList<Double>();
+        	for(int j = 3; j < tokens.length-1; j++) {
+        		
+                
+        		double val = Math.log((new Double(tokens[j])).doubleValue()) - 
+        				Math.log((new Double(tokens[j-1])).doubleValue());
+        		
+        		sensor_read.add(val);
+        	}
+        	sensorCollection.add(sensor_read);
+        	sensor_count++;
+        	
+            if(sensor_count == number_of_sensors) {
+            	
+            	
+        		double[][] sensorMatrix = sensorCollection.stream().map(  u  ->  u.stream().mapToDouble(i->i).toArray()  ).toArray(double[][]::new);
+        		DataSequence sequence = new DataSequence();
+        		
+        		for(int j = 2; j < tokens.length-1; j++) {
+        			     			
+        			double[] input = new double[number_of_sensors];
+        			for(int i = 0; i < number_of_sensors; i++) {
+        				input[i] = sensorMatrix[i][j-2];
+        			}
+
+        			DataStep step = new DataStep(input, null);
+        			
+        			//if at end of sequence, add a target state
+        			if(j == tokens.length-2) {
+        				
+        				double[] targetOutput = new double[2];
+                		targetOutput[0] = 1.0; targetOutput[1] = 0.0;
+                		                		
+                		if(sensorMatrix[0][sensorMatrix[0].length-1] != 0) {
+                			targetOutput[0] = 0.0; targetOutput[1] = 1.0;              			
+                		}
+                		step.targetOutput = new Matrix(targetOutput);
+        			}
+        			sequence.steps.add(step);
+        		}
+        		
+        		sensorCollection.clear();
+        		sensor_count = 0;
+        		result.add(sequence);	
+            }
+        }		
+		br.close();
+		return result; 
+	}	
 	
 	
 	public static double[][] readNoObjectData() throws IOException {

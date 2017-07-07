@@ -19,12 +19,12 @@ public class ExampleLODData {
 		int number_sensors = 8;
 		
 		DataSet data = new LODdata(number_sensors, number_sequences, "");
-		int hiddenDimension = 20;
+		int hiddenDimension = 25;
 		int hiddenLayers = 2;
-		double learningRate = 0.004;
+		double learningRate = 0.0001;
 		double initParamsStdDev = 0.08;
 
-		Model nn = NeuralNetworkHelper.makeGru( 
+		Model nn = NeuralNetworkHelper.makeRwa( 
 				data.inputDimension,
 				hiddenDimension, hiddenLayers, 
 				data.outputDimension, data.getModelOutputUnitToUse(), 

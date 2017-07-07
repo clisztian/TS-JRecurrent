@@ -25,7 +25,7 @@ public class TestLiveLOD {
 	public static void main(String[] args) throws Exception {
 		
 		final GpioController gpio = GpioFactory.getInstance();
-		final GpioPinDigitalOutput pin = gpio.provisionDigitalOutputPin(RaspiPin.GPIO_22, "PinLED", PinState.HIGH);
+		final GpioPinDigitalOutput pin = gpio.provisionDigitalOutputPin(RaspiPin.GPIO_26, "PinLED", PinState.HIGH);
 		
 		
 		File file = new File("/tmp/lod_data.csv");
